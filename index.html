@@ -37,6 +37,7 @@
       border-radius: 12px;
       outline: none;
       box-sizing: border-box;
+      background: white;
     }
 
     #clearBtn {
@@ -50,53 +51,48 @@
     }
 
     #results {
-      margin-top: 10px;
-      background: #f3f3f3;
-      border-radius: 12px;
-      max-height: 420px;
+      margin-top: 12px;
+      max-height: 430px;
       overflow-y: auto;
       display: none;
-      padding: 0;
+      padding-right: 4px;
+      background: transparent;
     }
 
     .person-card {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-decoration: none;
       color: black;
-      background: #ececec;
-      padding: 12px;
-      border-bottom: 1px solid #d6d6d6;
+      background: white;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
       cursor: pointer;
-    }
-
-    .person-card:first-child {
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-    }
-
-    .person-card:last-child {
-      border-bottom: none;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
     }
 
     .person-card:hover {
-      background: #e3e3e3;
+      background: #fafafa;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      transform: translateY(-1px);
     }
 
     .person-photo {
       width: 58px;
       height: 58px;
-      border-radius: 10px;
+      border-radius: 12px;
       object-fit: cover;
       flex-shrink: 0;
       background: #ddd;
+      display: block;
     }
 
     .person-info {
       min-width: 0;
+      overflow: hidden;
     }
 
     .person-name {
@@ -104,6 +100,7 @@
       font-weight: bold;
       margin-bottom: 4px;
       line-height: 1.2;
+      color: #000;
     }
 
     .person-url {
@@ -114,10 +111,11 @@
     }
 
     .empty-message {
-      padding: 14px;
+      padding: 14px 16px;
       color: #555;
-      background: #ececec;
-      border-radius: 12px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
       font-size: 14px;
     }
 
@@ -138,6 +136,12 @@
       #clearBtn {
         font-size: 14px;
         padding: 11px 14px;
+      }
+
+      .person-card {
+        padding: 11px 12px;
+        gap: 12px;
+        margin-bottom: 8px;
       }
 
       .person-photo {
