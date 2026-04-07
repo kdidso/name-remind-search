@@ -12,11 +12,6 @@
       padding: 0;
       font-family: Arial, sans-serif;
       background: transparent;
-      overflow: hidden;
-    }
-
-    body {
-      height: 100vh;
     }
 
     .search-container {
@@ -25,7 +20,6 @@
       margin: 0 auto;
       padding: 10px;
       box-sizing: border-box;
-      position: relative;
     }
 
     .search-row {
@@ -41,7 +35,6 @@
       border: none;
       border-radius: 12px;
       outline: none;
-      box-sizing: border-box;
       background: white;
     }
 
@@ -52,277 +45,140 @@
       border-radius: 12px;
       background: white;
       cursor: pointer;
-      white-space: nowrap;
     }
 
+    /* 🔥 THIS IS THE BIG CHANGE */
     #results {
-      margin-top: 14px;
-      max-height: 320px;
-      overflow-y: auto;
-      overflow-x: hidden;
+      margin-top: 20px;
       display: none;
-      padding: 2px 4px 2px 4px;
-      background: transparent;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
     }
 
     .person-card {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
       text-decoration: none;
       color: black;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(6px);
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      border-radius: 18px;
+
+      background: white;
+
+      padding: 16px 18px;
+      margin-bottom: 18px;
+
+      border-radius: 14px;
+
       box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.18),
-        0 2px 6px rgba(0, 0, 0, 0.12);
-      cursor: pointer;
-      transition:
-        transform 0.12s ease,
-        box-shadow 0.12s ease,
-        background 0.12s ease;
+        0 4px 12px rgba(0,0,0,0.15);
+
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
     .person-card:hover {
-      background: rgba(255, 255, 255, 1);
       transform: translateY(-2px);
       box-shadow:
-        0 10px 26px rgba(0, 0, 0, 0.22),
-        0 4px 10px rgba(0, 0, 0, 0.16);
+        0 8px 20px rgba(0,0,0,0.2);
     }
 
     .person-photo {
-      width: 64px;
-      height: 64px;
-      border-radius: 14px;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
       object-fit: cover;
-      flex-shrink: 0;
       background: #ddd;
-      display: block;
-    }
-
-    .person-info {
-      min-width: 0;
-      overflow: hidden;
+      flex-shrink: 0;
     }
 
     .person-name {
-      font-size: 17px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      line-height: 1.2;
-      color: #000;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
     .person-url {
-      font-size: 13px;
+      font-size: 14px;
       color: #555;
-      line-height: 1.25;
-      word-break: break-word;
     }
 
     .empty-message {
-      padding: 14px 16px;
+      font-size: 15px;
       color: #555;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 18px;
-      box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.18),
-        0 2px 6px rgba(0, 0, 0, 0.12);
-      font-size: 14px;
+      padding: 10px;
     }
 
     @media (max-width: 640px) {
-      .search-container {
-        padding: 6px;
-      }
-
-      .search-row {
-        gap: 8px;
-      }
-
-      #searchInput {
-        font-size: 16px;
-        padding: 13px 14px;
-      }
-
-      #clearBtn {
-        font-size: 14px;
-        padding: 11px 14px;
-      }
-
-      #results {
-        max-height: 260px;
-        margin-top: 12px;
-      }
-
-      .person-card {
-        padding: 12px 13px;
-        gap: 13px;
-        margin-bottom: 10px;
-        border-radius: 16px;
-      }
-
       .person-photo {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
+        width: 65px;
+        height: 65px;
       }
 
       .person-name {
-        font-size: 15px;
-      }
-
-      .person-url {
-        font-size: 12px;
+        font-size: 16px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="search-container">
     <div class="search-row">
-      <input
-        id="searchInput"
-        type="text"
-        placeholder="Search by name..."
-        autocomplete="off"
-      />
-      <button id="clearBtn" type="button">Clear</button>
+      <input id="searchInput" type="text" placeholder="Search by name..." />
+      <button id="clearBtn">Clear</button>
     </div>
 
     <div id="results"></div>
   </div>
 
   <script src="people.js"></script>
+
   <script>
-    const searchInput = document.getElementById("searchInput");
+    const input = document.getElementById("searchInput");
     const clearBtn = document.getElementById("clearBtn");
     const resultsDiv = document.getElementById("results");
 
-    function normalizeText(text) {
-      return (text || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim();
+    function normalize(text) {
+      return (text || "").toLowerCase().trim();
     }
 
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+    function runSearch() {
+      const query = normalize(input.value);
 
-    function escapeJsSingleQuoted(text) {
-      return String(text)
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'");
-    }
-
-    function scoreMatch(personName, query) {
-      const name = normalizeText(personName);
-
-      if (!query) return 0;
-      if (name === query) return 100;
-      if (name.startsWith(query)) return 80;
-      if (name.includes(query)) return 60;
-
-      const parts = query.split(/\s+/).filter(Boolean);
-      let score = 0;
-      for (const part of parts) {
-        if (name.includes(part)) score += 10;
+      if (!query) {
+        resultsDiv.style.display = "none";
+        resultsDiv.innerHTML = "";
+        return;
       }
-      return score;
-    }
 
-    function openPersonUrl(url) {
-      window.open(url, "_blank", "noopener");
-    }
+      const matches = (window.people || [])
+        .filter(p => normalize(p.name).includes(query))
+        .sort((a,b) => a.name.localeCompare(b.name));
 
-    function renderResults(matches) {
       if (!matches.length) {
         resultsDiv.innerHTML = '<div class="empty-message">No matches found.</div>';
         resultsDiv.style.display = "block";
         return;
       }
 
-      resultsDiv.innerHTML = matches.map(person => `
-        <a
-          class="person-card"
-          href="${person.url}"
-          target="_blank"
-          rel="noopener"
-          onclick="openPersonUrl('${escapeJsSingleQuoted(person.url)}'); return false;"
-        >
-          <img
-            class="person-photo"
-            src="${person.image}"
-            alt="${escapeHtml(person.name)}"
-            loading="lazy"
-            onerror="this.style.visibility='hidden';"
-          />
-          <div class="person-info">
-            <div class="person-name">${escapeHtml(person.name)}</div>
-            <div class="person-url">${escapeHtml(person.url)}</div>
+      resultsDiv.innerHTML = matches.map(p => `
+        <a class="person-card" href="${p.url}" target="_blank">
+          <img class="person-photo" src="${p.image}" />
+          <div>
+            <div class="person-name">${p.name}</div>
+            <div class="person-url">${p.url}</div>
           </div>
         </a>
       `).join("");
 
       resultsDiv.style.display = "block";
-      resultsDiv.scrollTop = 0;
     }
 
-    function runSearch() {
-      const query = normalizeText(searchInput.value);
+    input.addEventListener("input", runSearch);
 
-      if (!query) {
-        resultsDiv.innerHTML = "";
-        resultsDiv.style.display = "none";
-        return;
-      }
-
-      const matches = (window.people || [])
-        .map(person => ({
-          ...person,
-          _score: scoreMatch(person.name, query)
-        }))
-        .filter(person => person._score > 0)
-        .sort((a, b) => b._score - a._score || a.name.localeCompare(b.name))
-        .slice(0, 20);
-
-      renderResults(matches);
-    }
-
-    searchInput.addEventListener("input", runSearch);
-
-    searchInput.addEventListener("focus", () => {
-      if (searchInput.value.trim()) {
-        runSearch();
-      }
-    });
-
-    clearBtn.addEventListener("click", () => {
-      searchInput.value = "";
-      resultsDiv.innerHTML = "";
+    clearBtn.onclick = () => {
+      input.value = "";
       resultsDiv.style.display = "none";
-      searchInput.focus();
-    });
-
-    document.addEventListener("click", (e) => {
-      const container = document.querySelector(".search-container");
-      if (!container.contains(e.target)) {
-        resultsDiv.style.display = "none";
-      }
-    });
+      resultsDiv.innerHTML = "";
+      input.focus();
+    };
   </script>
 </body>
 </html>
