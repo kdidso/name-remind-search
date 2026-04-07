@@ -1,184 +1,389 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <base target="_blank">
-  <title>Name Remind Search</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base target="_blank">
+    <title>Name Remind Search</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: transparent;
-    }
-
-    .search-container {
-      width: 100%;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    #searchInput {
-      flex: 1;
-      padding: 14px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 12px;
-      outline: none;
-      background: white;
-    }
-
-    #clearBtn {
-      padding: 12px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 12px;
-      background: white;
-      cursor: pointer;
-    }
-
-    /* 🔥 THIS IS THE BIG CHANGE */
-    #results {
-      margin-top: 20px;
-      display: none;
-    }
-
-    .person-card {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      text-decoration: none;
-      color: black;
-
-      background: white;
-
-      padding: 16px 18px;
-      margin-bottom: 18px;
-
-      border-radius: 14px;
-
-      box-shadow:
-        0 4px 12px rgba(0,0,0,0.15);
-
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    .person-card:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 8px 20px rgba(0,0,0,0.2);
-    }
-
-    .person-photo {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      object-fit: cover;
-      background: #ddd;
-      flex-shrink: 0;
-    }
-
-    .person-name {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .person-url {
-      font-size: 14px;
-      color: #555;
-    }
-
-    .empty-message {
-      font-size: 15px;
-      color: #555;
-      padding: 10px;
-    }
-
-    @media (max-width: 640px) {
-      .person-photo {
-        width: 65px;
-        height: 65px;
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
       }
 
-      .person-name {
+      body {
+        margin: 0;
+        padding: 0 6px 10px 6px;
+        background-color: transparent;
+        font-family: "Roboto", Arial, sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* Sticky wrapper */
+      #search-sticky-wrap {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 0 0 6px 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-sizing: border-box;
+      }
+
+      /* Search bar */
+      #search-query {
+        width: min(720px, 90vw);
+        margin: 0 auto;
+        overflow: visible;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        color: #212121;
+        background-color: #fff;
         font-size: 16px;
+        line-height: 24px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       }
-    }
-  </style>
-</head>
 
-<body>
-  <div class="search-container">
-    <div class="search-row">
-      <input id="searchInput" type="text" placeholder="Search by name..." />
-      <button id="clearBtn">Clear</button>
+      #search-query-input {
+        width: 100%;
+        height: 40px;
+        font-size: 16px;
+        border: none;
+        color: #000;
+        background-color: transparent;
+        padding: 0 10px;
+        box-sizing: border-box;
+      }
+
+      #search-query-input:focus {
+        outline: none;
+      }
+
+      /* Clear button */
+      #clear-search-btn {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        margin-right: 4px;
+        border: none;
+        background: transparent;
+        color: #777;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      #clear-search-btn:hover {
+        background: #f1f3f4;
+        color: #222;
+      }
+
+      #clear-search-btn:focus {
+        outline: none;
+      }
+
+      /* Results grid */
+      #results {
+        width: min(1100px, 94vw);
+        margin: 10px auto 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+      }
+
+      /* Card */
+      .person-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .person-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+      }
+
+      /* Image container */
+      .person-image-wrap {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        background: #f3f3f3;
+        overflow: hidden;
+      }
+
+      .person-image-wrap.image-missing::before {
+        content: "No Image";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: #777;
+        font-size: 14px;
+      }
+
+      /* Image */
+      .person-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        display: block;
+      }
+
+      /* Name */
+      .person-name {
+        padding: 8px 8px 10px 8px;
+        font-size: 14px;
+        line-height: 1.3;
+        font-weight: 500;
+        text-align: center;
+        min-height: 38px;
+      }
+
+      /* No results */
+      #no-results {
+        display: none;
+        width: min(1100px, 94vw);
+        margin: 8px auto 0 auto;
+        text-align: center;
+        color: white;
+        font-size: 15px;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      }
+
+      /* Mobile tweaks */
+      @media (max-width: 700px) {
+        html,
+        body {
+          overscroll-behavior: none;
+        }
+
+        body {
+          margin: 0;
+          padding: 56px 6px 10px 6px;
+          background-color: transparent;
+          font-family: "Roboto", Arial, sans-serif;
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: auto;
+        }
+
+        #search-sticky-wrap {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+          padding: 8px 6px 6px 6px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          box-sizing: border-box;
+        }
+
+        #search-query {
+          width: calc(100vw - 24px);
+          max-width: none;
+          margin: 0 auto;
+        }
+
+        #results {
+          width: calc(100vw - 24px);
+          grid-template-columns: repeat(2, minmax(0, 140px));
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .person-card {
+          border-radius: 8px;
+        }
+
+        .person-image-wrap {
+          aspect-ratio: 4 / 3;
+          background: #f3f3f3;
+        }
+
+        .person-image {
+          object-fit: contain;
+          object-position: center center;
+          background: #f3f3f3;
+        }
+
+        .person-name {
+          font-size: 12px;
+          line-height: 1.15;
+          padding: 4px 6px 6px 6px;
+          min-height: 24px;
+        }
+
+        #no-results {
+          color: white;
+          text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="search-sticky-wrap">
+      <div id="search-query">
+        <input
+          type="text"
+          id="search-query-input"
+          placeholder="Search Names"
+        />
+        <button id="clear-search-btn" type="button" aria-label="Clear search" title="Clear search">×</button>
+      </div>
     </div>
 
     <div id="results"></div>
-  </div>
+    <div id="no-results">Type at least 3 letters to search.</div>
 
-  <script src="people.js"></script>
-
-  <script>
-    const input = document.getElementById("searchInput");
-    const clearBtn = document.getElementById("clearBtn");
-    const resultsDiv = document.getElementById("results");
-
-    function normalize(text) {
-      return (text || "").toLowerCase().trim();
-    }
-
-    function runSearch() {
-      const query = normalize(input.value);
-
-      if (!query) {
-        resultsDiv.style.display = "none";
-        resultsDiv.innerHTML = "";
-        return;
+    <script src="people.js"></script>
+    <script>
+      function normalizeText(str) {
+        return (str || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9\s]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
       }
 
-      const matches = (window.people || [])
-        .filter(p => normalize(p.name).includes(query))
-        .sort((a,b) => a.name.localeCompare(b.name));
-
-      if (!matches.length) {
-        resultsDiv.innerHTML = '<div class="empty-message">No matches found.</div>';
-        resultsDiv.style.display = "block";
-        return;
+      function updateClearButton() {
+        const inputEl = document.getElementById("search-query-input");
+        const clearBtn = document.getElementById("clear-search-btn");
+        clearBtn.style.display = inputEl.value.trim() ? "flex" : "none";
       }
 
-      resultsDiv.innerHTML = matches.map(p => `
-        <a class="person-card" href="${p.url}" target="_blank">
-          <img class="person-photo" src="${p.image}" />
-          <div>
-            <div class="person-name">${p.name}</div>
-            <div class="person-url">${p.url}</div>
-          </div>
-        </a>
-      `).join("");
+      function getFilteredPeople(query) {
+        const q = normalizeText(query);
 
-      resultsDiv.style.display = "block";
-    }
+        if (q.length < 3) return [];
 
-    input.addEventListener("input", runSearch);
+        return (window.people || []).filter(person => {
+          const name = normalizeText(person.name);
+          return name.includes(q);
+        }).slice(0, 8);
+      }
 
-    clearBtn.onclick = () => {
-      input.value = "";
-      resultsDiv.style.display = "none";
-      resultsDiv.innerHTML = "";
-      input.focus();
-    };
-  </script>
-</body>
+      function renderCards(list) {
+        const resultsEl = document.getElementById("results");
+        const noResultsEl = document.getElementById("no-results");
+
+        resultsEl.innerHTML = "";
+
+        if (!list.length) {
+          noResultsEl.style.display = "block";
+          return;
+        }
+
+        noResultsEl.style.display = "none";
+
+        list.forEach(person => {
+          const card = document.createElement("a");
+          card.className = "person-card";
+          card.href = person.url;
+          card.target = "_blank";
+          card.rel = "noopener noreferrer";
+
+          const imgWrap = document.createElement("div");
+          imgWrap.className = "person-image-wrap";
+
+          const img = document.createElement("img");
+          img.className = "person-image";
+          img.src = person.image;
+          img.alt = person.name;
+          img.loading = "lazy";
+
+          img.onerror = function () {
+            this.style.display = "none";
+            imgWrap.classList.add("image-missing");
+          };
+
+          imgWrap.appendChild(img);
+
+          const name = document.createElement("div");
+          name.className = "person-name";
+          name.textContent = person.name;
+
+          card.appendChild(imgWrap);
+          card.appendChild(name);
+
+          resultsEl.appendChild(card);
+        });
+      }
+
+      function updateResults() {
+        const inputEl = document.getElementById("search-query-input");
+        const query = inputEl.value.trim();
+        const filtered = getFilteredPeople(query);
+        const noResultsEl = document.getElementById("no-results");
+
+        if (query.length < 3) {
+          document.getElementById("results").innerHTML = "";
+          noResultsEl.textContent = "Type at least 3 letters to search.";
+          noResultsEl.style.display = "block";
+          updateClearButton();
+          return;
+        }
+
+        renderCards(filtered);
+
+        if (!filtered.length) {
+          noResultsEl.textContent = "No matches found.";
+          noResultsEl.style.display = "block";
+        }
+
+        updateClearButton();
+      }
+
+      function clearSearch() {
+        const inputEl = document.getElementById("search-query-input");
+        const resultsEl = document.getElementById("results");
+        const noResultsEl = document.getElementById("no-results");
+
+        inputEl.value = "";
+        resultsEl.innerHTML = "";
+        noResultsEl.textContent = "Type at least 3 letters to search.";
+        noResultsEl.style.display = "block";
+        updateClearButton();
+        inputEl.focus();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const inputEl = document.getElementById("search-query-input");
+        const clearBtn = document.getElementById("clear-search-btn");
+
+        inputEl.addEventListener("input", updateResults);
+        clearBtn.addEventListener("click", clearSearch);
+
+        inputEl.addEventListener("keydown", e => {
+          if (e.key === "Escape") {
+            clearSearch();
+          }
+        });
+
+        document.getElementById("no-results").style.display = "block";
+        updateClearButton();
+      });
+    </script>
+  </body>
 </html>
