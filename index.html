@@ -1,160 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <title>Name Remind Search</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base target="_blank">
+  <title>Name Remind Search</title>
+
   <style>
-    :root {
-      --border: #d0d7de;
-      --bg: #ffffff;
-      --muted: #6b7280;
-      --hover: #f3f4f6;
-      --shadow: 0 6px 18px rgba(0,0,0,0.12);
-      --radius: 12px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      padding: 0;
+      font-family: Arial, sans-serif;
       background: transparent;
     }
 
-    .search-wrap {
-      position: relative;
+    .search-container {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
       margin: 0 auto;
-      padding: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+      position: relative;
     }
 
     .search-row {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
     }
 
     #searchInput {
-      width: 100%;
+      flex: 1;
       padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
       font-size: 16px;
+      border: none;
+      border-radius: 12px;
       outline: none;
-      background: var(--bg);
-    }
-
-    #searchInput:focus {
-      border-color: #9ca3af;
+      box-sizing: border-box;
     }
 
     #clearBtn {
-      flex: 0 0 auto;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #fff;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background: white;
       cursor: pointer;
-      font-size: 14px;
-    }
-
-    #clearBtn:hover {
-      background: var(--hover);
+      white-space: nowrap;
     }
 
     #results {
-      position: absolute;
-      top: calc(100% - 2px);
-      left: 8px;
-      right: 8px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      max-height: 430px;
+      margin-top: 10px;
+      background: #f3f3f3;
+      border-radius: 12px;
+      max-height: 420px;
       overflow-y: auto;
-      z-index: 9999;
       display: none;
+      padding: 0;
     }
 
-    .result-item {
+    .person-card {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
       text-decoration: none;
-      color: inherit;
-      border-bottom: 1px solid #eceff3;
+      color: black;
+      background: #ececec;
+      padding: 12px;
+      border-bottom: 1px solid #d6d6d6;
+      cursor: pointer;
     }
 
-    .result-item:last-child {
+    .person-card:first-child {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .person-card:last-child {
       border-bottom: none;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
-    .result-item:hover {
-      background: var(--hover);
+    .person-card:hover {
+      background: #e3e3e3;
     }
 
-    .result-thumb {
-      width: 56px;
-      height: 56px;
-      object-fit: cover;
+    .person-photo {
+      width: 58px;
+      height: 58px;
       border-radius: 10px;
-      flex: 0 0 auto;
-      background: #f3f4f6;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #ddd;
     }
 
-    .result-text {
+    .person-info {
       min-width: 0;
     }
 
-    .result-name {
+    .person-name {
       font-size: 16px;
-      font-weight: 600;
-      line-height: 1.2;
+      font-weight: bold;
       margin-bottom: 4px;
+      line-height: 1.2;
     }
 
-    .result-url {
+    .person-url {
       font-size: 13px;
-      color: var(--muted);
+      color: #555;
       line-height: 1.2;
       word-break: break-word;
     }
 
-    .empty-state {
+    .empty-message {
       padding: 14px;
-      color: var(--muted);
+      color: #555;
+      background: #ececec;
+      border-radius: 12px;
       font-size: 14px;
     }
 
     @media (max-width: 640px) {
-      .search-wrap {
+      .search-container {
         padding: 6px;
       }
 
-      #results {
-        left: 6px;
-        right: 6px;
-      }
-
-      .result-thumb {
-        width: 48px;
-        height: 48px;
+      .search-row {
+        gap: 8px;
       }
 
       #searchInput {
         font-size: 16px;
+        padding: 13px 14px;
+      }
+
+      #clearBtn {
+        font-size: 14px;
+        padding: 11px 14px;
+      }
+
+      .person-photo {
+        width: 52px;
+        height: 52px;
+      }
+
+      .person-name {
+        font-size: 15px;
+      }
+
+      .person-url {
+        font-size: 12px;
+      }
+
+      #results {
+        max-height: 360px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="search-wrap">
+  <div class="search-container">
     <div class="search-row">
       <input
         id="searchInput"
@@ -162,8 +168,9 @@
         placeholder="Search by name..."
         autocomplete="off"
       />
-      <button id="clearBtn" type="button" aria-label="Clear search">Clear</button>
+      <button id="clearBtn" type="button">Clear</button>
     </div>
+
     <div id="results"></div>
   </div>
 
@@ -171,55 +178,14 @@
   <script>
     const searchInput = document.getElementById("searchInput");
     const clearBtn = document.getElementById("clearBtn");
-    const resultsBox = document.getElementById("results");
+    const resultsDiv = document.getElementById("results");
 
-    function normalizeText(value) {
-      return (value || "")
+    function normalizeText(text) {
+      return (text || "")
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .trim();
-    }
-
-    function scoreMatch(person, query) {
-      const name = normalizeText(person.name);
-      if (!query) return 0;
-      if (name === query) return 100;
-      if (name.startsWith(query)) return 80;
-      if (name.includes(query)) return 60;
-
-      const parts = query.split(/\s+/).filter(Boolean);
-      let matched = 0;
-      for (const part of parts) {
-        if (name.includes(part)) matched++;
-      }
-      return matched > 0 ? matched * 10 : 0;
-    }
-
-    function renderResults(matches) {
-      if (!matches.length) {
-        resultsBox.innerHTML = `<div class="empty-state">No matches found.</div>`;
-        resultsBox.style.display = "block";
-        return;
-      }
-
-      resultsBox.innerHTML = matches.map(person => `
-        <a class="result-item" href="${person.url}" target="_top" rel="noopener">
-          <img
-            class="result-thumb"
-            src="${person.image}"
-            alt="${person.name}"
-            loading="lazy"
-            onerror="this.style.visibility='hidden';"
-          />
-          <div class="result-text">
-            <div class="result-name">${escapeHtml(person.name)}</div>
-            <div class="result-url">${escapeHtml(person.url)}</div>
-          </div>
-        </a>
-      `).join("");
-
-      resultsBox.style.display = "block";
     }
 
     function escapeHtml(text) {
@@ -231,17 +197,72 @@
         .replace(/'/g, "&#039;");
     }
 
+    function scoreMatch(personName, query) {
+      const name = normalizeText(personName);
+
+      if (!query) return 0;
+      if (name === query) return 100;
+      if (name.startsWith(query)) return 80;
+      if (name.includes(query)) return 60;
+
+      const parts = query.split(/\s+/).filter(Boolean);
+      let score = 0;
+      for (const part of parts) {
+        if (name.includes(part)) score += 10;
+      }
+      return score;
+    }
+
+    function openPersonUrl(url) {
+      window.open(url, "_blank", "noopener");
+    }
+
+    function renderResults(matches) {
+      if (!matches.length) {
+        resultsDiv.innerHTML = '<div class="empty-message">No matches found.</div>';
+        resultsDiv.style.display = "block";
+        return;
+      }
+
+      resultsDiv.innerHTML = matches.map(person => `
+        <a
+          class="person-card"
+          href="${person.url}"
+          target="_blank"
+          rel="noopener"
+          onclick="openPersonUrl('${String(person.url).replace(/'/g, "\\'")}'); return false;"
+        >
+          <img
+            class="person-photo"
+            src="${person.image}"
+            alt="${escapeHtml(person.name)}"
+            loading="lazy"
+            onerror="this.style.visibility='hidden';"
+          />
+          <div class="person-info">
+            <div class="person-name">${escapeHtml(person.name)}</div>
+            <div class="person-url">${escapeHtml(person.url)}</div>
+          </div>
+        </a>
+      `).join("");
+
+      resultsDiv.style.display = "block";
+    }
+
     function runSearch() {
       const query = normalizeText(searchInput.value);
 
       if (!query) {
-        resultsBox.innerHTML = "";
-        resultsBox.style.display = "none";
+        resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none";
         return;
       }
 
       const matches = (window.people || [])
-        .map(person => ({ ...person, _score: scoreMatch(person, query) }))
+        .map(person => ({
+          ...person,
+          _score: scoreMatch(person.name, query)
+        }))
         .filter(person => person._score > 0)
         .sort((a, b) => b._score - a._score || a.name.localeCompare(b.name))
         .slice(0, 20);
@@ -251,23 +272,23 @@
 
     searchInput.addEventListener("input", runSearch);
 
-    clearBtn.addEventListener("click", () => {
-      searchInput.value = "";
-      resultsBox.innerHTML = "";
-      resultsBox.style.display = "none";
-      searchInput.focus();
-    });
-
-    document.addEventListener("click", (event) => {
-      const wrap = document.querySelector(".search-wrap");
-      if (!wrap.contains(event.target)) {
-        resultsBox.style.display = "none";
-      }
-    });
-
     searchInput.addEventListener("focus", () => {
       if (searchInput.value.trim()) {
         runSearch();
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      resultsDiv.innerHTML = "";
+      resultsDiv.style.display = "none";
+      searchInput.focus();
+    });
+
+    document.addEventListener("click", (e) => {
+      const container = document.querySelector(".search-container");
+      if (!container.contains(e.target)) {
+        resultsDiv.style.display = "none";
       }
     });
   </script>
