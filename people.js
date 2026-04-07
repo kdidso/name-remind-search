@@ -538,6 +538,7 @@ window.people = [
   { name: "Teren Kelley", image: "https://drive.google.com/thumbnail?id=1gDL7FgZO8tUdFrjfasJ5TKx9J23ZVolj&sz=w1000", url: "https://sites.google.com/view/name-remind/teren-kelley" },
   { name: "Teryl Levon Cain", image: "https://drive.google.com/thumbnail?id=1GSiU8Kkn_adBKR-IP5XcXuUUqi7pyFwp&sz=w1000", url: "https://sites.google.com/view/name-remind/teryl-levon-cain" },
   { name: "Thomas Anderson", image: "https://drive.google.com/thumbnail?id=17tWCMGNhsZoae2ZB3e16HZdHjkyxOwrW&sz=w1000", url: "https://sites.google.com/view/name-remind/thomas-anderson" },
+  { name: "Thomas Tuite", image: "https://drive.google.com/thumbnail?id=1Mn1rbgiNTqSrC5A4Y_W2g02A2aluX6-w&sz=w1000", url: "https://sites.google.com/view/name-remind/thomas-tuite" },
   { name: "Tito Munoz", image: "https://drive.google.com/thumbnail?id=1n14Gh-dmFhWeHd9Wd2hkQKrl3GXbqIbp&sz=w1000", url: "https://sites.google.com/view/name-remind/tito-munoz" },
   { name: "Todd Beckstrand", image: "https://drive.google.com/thumbnail?id=1bXWBndPoqbX3U4a3lKkgkz1oCiK2KsER&sz=w1000", url: "https://sites.google.com/view/name-remind/todd-beckstrand" },
   { name: "Tom Jensen", image: "https://drive.google.com/thumbnail?id=1TUm-OS99ZtW-3jCTeHJ85vMfoGvi31s5&sz=w1000", url: "https://sites.google.com/view/name-remind/tom-jensen" },
