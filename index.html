@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Name Remind Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --border: #d0d7de;
+      --bg: #ffffff;
+      --muted: #6b7280;
+      --hover: #f3f4f6;
+      --shadow: 0 6px 18px rgba(0,0,0,0.12);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: transparent;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 8px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 16px;
+      outline: none;
+      background: var(--bg);
+    }
+
+    #searchInput:focus {
+      border-color: #9ca3af;
+    }
+
+    #clearBtn {
+      flex: 0 0 auto;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #clearBtn:hover {
+      background: var(--hover);
+    }
+
+    #results {
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 8px;
+      right: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-height: 430px;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      text-decoration: none;
+      color: inherit;
+      border-bottom: 1px solid #eceff3;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-item:hover {
+      background: var(--hover);
+    }
+
+    .result-thumb {
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 10px;
+      flex: 0 0 auto;
+      background: #f3f4f6;
+    }
+
+    .result-text {
+      min-width: 0;
+    }
+
+    .result-name {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .result-url {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .empty-state {
+      padding: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .search-wrap {
+        padding: 6px;
+      }
+
+      #results {
+        left: 6px;
+        right: 6px;
+      }
+
+      .result-thumb {
+        width: 48px;
+        height: 48px;
+      }
+
+      #searchInput {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="search-wrap">
+    <div class="search-row">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search by name..."
+        autocomplete="off"
+      />
+      <button id="clearBtn" type="button" aria-label="Clear search">Clear</button>
+    </div>
+    <div id="results"></div>
+  </div>
+
+  <script src="people.js"></script>
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const clearBtn = document.getElementById("clearBtn");
+    const resultsBox = document.getElementById("results");
+
+    function normalizeText(value) {
+      return (value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    function scoreMatch(person, query) {
+      const name = normalizeText(person.name);
+      if (!query) return 0;
+      if (name === query) return 100;
+      if (name.startsWith(query)) return 80;
+      if (name.includes(query)) return 60;
+
+      const parts = query.split(/\s+/).filter(Boolean);
+      let matched = 0;
+      for (const part of parts) {
+        if (name.includes(part)) matched++;
+      }
+      return matched > 0 ? matched * 10 : 0;
+    }
+
+    function renderResults(matches) {
+      if (!matches.length) {
+        resultsBox.innerHTML = `<div class="empty-state">No matches found.</div>`;
+        resultsBox.style.display = "block";
+        return;
+      }
+
+      resultsBox.innerHTML = matches.map(person => `
+        <a class="result-item" href="${person.url}" target="_top" rel="noopener">
+          <img
+            class="result-thumb"
+            src="${person.image}"
+            alt="${person.name}"
+            loading="lazy"
+            onerror="this.style.visibility='hidden';"
+          />
+          <div class="result-text">
+            <div class="result-name">${escapeHtml(person.name)}</div>
+            <div class="result-url">${escapeHtml(person.url)}</div>
+          </div>
+        </a>
+      `).join("");
+
+      resultsBox.style.display = "block";
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function runSearch() {
+      const query = normalizeText(searchInput.value);
+
+      if (!query) {
+        resultsBox.innerHTML = "";
+        resultsBox.style.display = "none";
+        return;
+      }
+
+      const matches = (window.people || [])
+        .map(person => ({ ...person, _score: scoreMatch(person, query) }))
+        .filter(person => person._score > 0)
+        .sort((a, b) => b._score - a._score || a.name.localeCompare(b.name))
+        .slice(0, 20);
+
+      renderResults(matches);
+    }
+
+    searchInput.addEventListener("input", runSearch);
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      resultsBox.innerHTML = "";
+      resultsBox.style.display = "none";
+      searchInput.focus();
+    });
+
+    document.addEventListener("click", (event) => {
+      const wrap = document.querySelector(".search-wrap");
+      if (!wrap.contains(event.target)) {
+        resultsBox.style.display = "none";
+      }
+    });
+
+    searchInput.addEventListener("focus", () => {
+      if (searchInput.value.trim()) {
+        runSearch();
+      }
+    });
+  </script>
+</body>
+</html>
