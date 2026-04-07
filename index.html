@@ -281,7 +281,7 @@
         return (window.people || []).filter(person => {
           const name = normalizeText(person.name);
           return name.includes(q);
-        }).slice(0, 8);
+        }).slice(0, 20);
       }
 
       function renderCards(list) {
