@@ -1,8 +1,8 @@
 from pathlib import Path
 
 BASE = Path("data")
-DELETE_FILE = BASE / "Names_to_Delete.txt"
-IGNORE_FILE = BASE / "ignore_delete_names.txt"
+NEW_NAMES_FILE = BASE / "New_Names.txt"
+IGNORE_FILE = BASE / "ignore_new_names.txt"
 
 
 def read_names(path: Path) -> set[str]:
@@ -16,13 +16,13 @@ def write_names(path: Path, names: set[str]) -> None:
 
 
 def main() -> None:
-    delete_names = read_names(DELETE_FILE)
+    new_names = read_names(NEW_NAMES_FILE)
     ignore_names = read_names(IGNORE_FILE)
 
-    filtered = delete_names - ignore_names
-    write_names(DELETE_FILE, filtered)
+    filtered = new_names - ignore_names
+    write_names(NEW_NAMES_FILE, filtered)
 
-    print(f"Filtered Names_to_Delete.txt. Remaining: {len(filtered)}")
+    print(f"Filtered New_Names.txt. Remaining: {len(filtered)}")
 
 
 if __name__ == "__main__":
